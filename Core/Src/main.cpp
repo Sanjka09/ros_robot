@@ -139,6 +139,7 @@ int BLDC = 0;
 uint8_t HC_PS2_RX[9];
 uint8_t HC_PS2_TX[9]={0x01, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,};
 uint8_t RxData[1];
+int16_t sensor_buff[5];
 
 
 uint8_t             data[8];
@@ -1378,7 +1379,54 @@ void StartTask05(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	  loop();
+
+	  if(HAL_GPIO_ReadPin(UP1_GPIO_Port, UP1_Pin)==1){
+	  		  sensor_buff[4]=sensor_buff[4]|0b00000001;
+	  	  }
+	  	  else{
+	  		  sensor_buff[4]=sensor_buff[4]&0b11111110;
+	  	  }
+	  	  if(HAL_GPIO_ReadPin(UP2_GPIO_Port, UP2_Pin)==1){
+	  		  sensor_buff[4]=sensor_buff[4]|0b00000010;
+	  	  }
+	  	  else{
+	  		  sensor_buff[4]=sensor_buff[4]&0b11111101;
+	  	  }
+	  	  if(HAL_GPIO_ReadPin(DOWN1_GPIO_Port, DOWN1_Pin)==1){
+	  		  sensor_buff[4]=sensor_buff[4]|0b00000100;
+	  	  }
+	  	  else{
+	  		  sensor_buff[4]=sensor_buff[4]&0b11111011;
+	  	  }
+	  	  if(HAL_GPIO_ReadPin(DOWN2_GPIO_Port, DOWN2_Pin)==1){
+	  		  sensor_buff[4]=sensor_buff[4]|0b00001000;
+	  	  }
+	  	  else{
+	  		  sensor_buff[4]=sensor_buff[4]&0b11110111;
+	  	  }
+	  	  if(HAL_GPIO_ReadPin(BALL1_GPIO_Port, BALL1_Pin)==1){
+	  		  sensor_buff[4]=sensor_buff[4]|0b00010000;
+	  	  }
+	  	  else{
+	  		  sensor_buff[4]=sensor_buff[4]&0b11101111;
+	  	  }
+	  	  if(HAL_GPIO_ReadPin(BALL2_GPIO_Port, BALL2_Pin)==1){
+	  		  sensor_buff[4]=sensor_buff[4]|0b00100000;
+	  	  }
+	  	  else{
+	  		  sensor_buff[4]=sensor_buff[4]&0b11011111;
+	  	  }
+	  	  if(HAL_GPIO_ReadPin(IR_GPIO_Port, IR_Pin)==1){
+	  		  sensor_buff[4]=sensor_buff[4]|0b01000000;
+	  	  }
+	  	  else{
+	  		  sensor_buff[4]=sensor_buff[4]&0b10111111;
+	  	  }
+	  	  sensor_buff[0]=M1.en_speed;
+	  	  sensor_buff[1]=M2.en_speed;
+	  	  sensor_buff[2]=M3.en_speed;
+	  	  sensor_buff[3]=M4.en_speed;
+	  	  loop();
     osDelay(10);
   }
   /* USER CODE END StartTask05 */
