@@ -2393,9 +2393,9 @@ static void MX_TIM8_Init(void)
  80015de:	4b56      	ldr	r3, [pc, #344]	; (8001738 <_ZL12MX_TIM8_Initv+0x198>)
  80015e0:	4a56      	ldr	r2, [pc, #344]	; (800173c <_ZL12MX_TIM8_Initv+0x19c>)
  80015e2:	601a      	str	r2, [r3, #0]
-  htim8.Init.Prescaler = 2650-1;
+  htim8.Init.Prescaler = 26500-1;
  80015e4:	4b54      	ldr	r3, [pc, #336]	; (8001738 <_ZL12MX_TIM8_Initv+0x198>)
- 80015e6:	f640 2259 	movw	r2, #2649	; 0xa59
+ 80015e6:	f246 7283 	movw	r2, #26499	; 0x6783
  80015ea:	605a      	str	r2, [r3, #4]
   htim8.Init.CounterMode = TIM_COUNTERMODE_UP;
  80015ec:	4b52      	ldr	r3, [pc, #328]	; (8001738 <_ZL12MX_TIM8_Initv+0x198>)
@@ -2686,39 +2686,39 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 1 */
 
   /* USER CODE END USART2_Init 1 */
-  huart2.Instance = USART2;
+	  huart2.Instance = USART2;
  80017a0:	4b13      	ldr	r3, [pc, #76]	; (80017f0 <_ZL19MX_USART2_UART_Initv+0x54>)
  80017a2:	4a14      	ldr	r2, [pc, #80]	; (80017f4 <_ZL19MX_USART2_UART_Initv+0x58>)
  80017a4:	601a      	str	r2, [r3, #0]
-  huart2.Init.BaudRate = 115200;
+	  huart2.Init.BaudRate = 57600;
  80017a6:	4b12      	ldr	r3, [pc, #72]	; (80017f0 <_ZL19MX_USART2_UART_Initv+0x54>)
- 80017a8:	f44f 32e1 	mov.w	r2, #115200	; 0x1c200
+ 80017a8:	f44f 4261 	mov.w	r2, #57600	; 0xe100
  80017ac:	605a      	str	r2, [r3, #4]
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+	  huart2.Init.WordLength = UART_WORDLENGTH_8B;
  80017ae:	4b10      	ldr	r3, [pc, #64]	; (80017f0 <_ZL19MX_USART2_UART_Initv+0x54>)
  80017b0:	2200      	movs	r2, #0
  80017b2:	609a      	str	r2, [r3, #8]
-  huart2.Init.StopBits = UART_STOPBITS_1;
+	  huart2.Init.StopBits = UART_STOPBITS_1;
  80017b4:	4b0e      	ldr	r3, [pc, #56]	; (80017f0 <_ZL19MX_USART2_UART_Initv+0x54>)
  80017b6:	2200      	movs	r2, #0
  80017b8:	60da      	str	r2, [r3, #12]
-  huart2.Init.Parity = UART_PARITY_NONE;
+	  huart2.Init.Parity = UART_PARITY_NONE;
  80017ba:	4b0d      	ldr	r3, [pc, #52]	; (80017f0 <_ZL19MX_USART2_UART_Initv+0x54>)
  80017bc:	2200      	movs	r2, #0
  80017be:	611a      	str	r2, [r3, #16]
-  huart2.Init.Mode = UART_MODE_TX_RX;
+	  huart2.Init.Mode = UART_MODE_TX_RX;
  80017c0:	4b0b      	ldr	r3, [pc, #44]	; (80017f0 <_ZL19MX_USART2_UART_Initv+0x54>)
  80017c2:	220c      	movs	r2, #12
  80017c4:	615a      	str	r2, [r3, #20]
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
  80017c6:	4b0a      	ldr	r3, [pc, #40]	; (80017f0 <_ZL19MX_USART2_UART_Initv+0x54>)
  80017c8:	2200      	movs	r2, #0
  80017ca:	619a      	str	r2, [r3, #24]
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+	  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
  80017cc:	4b08      	ldr	r3, [pc, #32]	; (80017f0 <_ZL19MX_USART2_UART_Initv+0x54>)
  80017ce:	2200      	movs	r2, #0
  80017d0:	61da      	str	r2, [r3, #28]
-  if (HAL_UART_Init(&huart2) != HAL_OK)
+	  if (HAL_UART_Init(&huart2) != HAL_OK)
  80017d2:	4807      	ldr	r0, [pc, #28]	; (80017f0 <_ZL19MX_USART2_UART_Initv+0x54>)
  80017d4:	f008 ffde 	bl	800a794 <HAL_UART_Init>
  80017d8:	4603      	mov	r3, r0
@@ -2729,10 +2729,10 @@ static void MX_USART2_UART_Init(void)
  80017e2:	b2db      	uxtb	r3, r3
  80017e4:	2b00      	cmp	r3, #0
  80017e6:	d001      	beq.n	80017ec <_ZL19MX_USART2_UART_Initv+0x50>
-  {
-    Error_Handler();
+	  {
+	    Error_Handler();
  80017e8:	f001 fe88 	bl	80034fc <Error_Handler>
-  }
+	  }
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
@@ -3097,9 +3097,9 @@ void MotorStop(void)
 {
  8001a30:	b580      	push	{r7, lr}
  8001a32:	af00      	add	r7, sp, #0
-	TIM8 -> CCR1 = 99;
+	TIM8 -> CCR1 = 1;
  8001a34:	4b08      	ldr	r3, [pc, #32]	; (8001a58 <_Z9MotorStopv+0x28>)
- 8001a36:	2263      	movs	r2, #99	; 0x63
+ 8001a36:	2201      	movs	r2, #1
  8001a38:	635a      	str	r2, [r3, #52]	; 0x34
 	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_SET);
  8001a3a:	2201      	movs	r2, #1
@@ -3289,9 +3289,9 @@ void motorspeed(){
  8001bf8:	68db      	ldr	r3, [r3, #12]
  8001bfa:	f5b3 7f96 	cmp.w	r3, #300	; 0x12c
  8001bfe:	dd02      	ble.n	8001c06 <_Z10motorspeedv+0x6a>
-		TIM8 -> CCR1 = 99;
+		TIM8 -> CCR1 = 1;
  8001c00:	4b12      	ldr	r3, [pc, #72]	; (8001c4c <_Z10motorspeedv+0xb0>)
- 8001c02:	2263      	movs	r2, #99	; 0x63
+ 8001c02:	2201      	movs	r2, #1
  8001c04:	635a      	str	r2, [r3, #52]	; 0x34
 //	TIM8 -> CCR2 = 50;
 	if(Motor.PWM < 300 && DC_pid.error != 0){
@@ -3303,9 +3303,9 @@ void motorspeed(){
  8001c12:	68db      	ldr	r3, [r3, #12]
  8001c14:	2b00      	cmp	r3, #0
  8001c16:	d002      	beq.n	8001c1e <_Z10motorspeedv+0x82>
-		TIM8 -> CCR1 = 40;
+		TIM8 -> CCR1 = 60;
  8001c18:	4b0c      	ldr	r3, [pc, #48]	; (8001c4c <_Z10motorspeedv+0xb0>)
- 8001c1a:	2228      	movs	r2, #40	; 0x28
+ 8001c1a:	223c      	movs	r2, #60	; 0x3c
  8001c1c:	635a      	str	r2, [r3, #52]	; 0x34
 	}
 	if(motor_dir == 1){
