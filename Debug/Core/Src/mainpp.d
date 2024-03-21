@@ -40,7 +40,8 @@ Core/Src/mainpp.o: ../Core/Src/mainpp.cpp ../Core/Inc/mainpp.h \
  ../Core/Inc/stm32f4xx_it.h ../Core/Inc/std_msgs/String.h \
  ../Core/Inc/std_msgs/Int16MultiArray.h \
  ../Core/Inc/std_msgs/MultiArrayLayout.h \
- ../Core/Inc/std_msgs/MultiArrayDimension.h
+ ../Core/Inc/std_msgs/MultiArrayDimension.h \
+ ../Core/Inc/geometry_msgs/Twist.h ../Core/Inc/geometry_msgs/Vector3.h
 ../Core/Inc/mainpp.h:
 ../Core/Inc/ros.h:
 ../Core/Inc/ros/node_handle.h:
@@ -93,3 +94,5 @@ Core/Src/mainpp.o: ../Core/Src/mainpp.cpp ../Core/Inc/mainpp.h \
 ../Core/Inc/std_msgs/Int16MultiArray.h:
 ../Core/Inc/std_msgs/MultiArrayLayout.h:
 ../Core/Inc/std_msgs/MultiArrayDimension.h:
+../Core/Inc/geometry_msgs/Twist.h:
+../Core/Inc/geometry_msgs/Vector3.h:

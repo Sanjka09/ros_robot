@@ -115,6 +115,8 @@ osThreadId ColorHandle;
 double pi=3.14159265359;
 double ML;
 double MR;
+extern int right_joy;
+extern double left_joy;
 double speed;
 double degree_a;
 
@@ -1089,9 +1091,10 @@ void task2_joystick(void const * argument)
 	  HAL_SPI_TransmitReceive(&hspi2, HC_PS2_TX, HC_PS2_RX, 9, 10);
 	  spi_disable;
 	  PS2.LY=-(HC_PS2_RX[8]-127);
-	  PS2.LX=(HC_PS2_RX[7]-127);
-	  PS2.RY=HC_PS2_RX[6]-128;
-	  PS2.RX=HC_PS2_RX[5]-128;
+	  PS2.LX=left_joy;  //(HC_PS2_RX[7]-127);
+	  //PS2.RY=HC_PS2_RX[6]-128;
+	 // PS2.RX=HC_PS2_RX[5]-128;
+	  PS2.RX = right_joy;
 	  PS2.X=PS2.LX/(float)128;
 	  PS2.Y=PS2.LY/(float)128;
 	  speed=sqrt(PS2.X*PS2.X+PS2.Y*PS2.Y);
