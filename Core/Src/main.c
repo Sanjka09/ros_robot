@@ -119,6 +119,8 @@ double speed;
 double degree_a;
 
 float freq=0;
+float blue_freq;
+float red_freq;
 float dif=0;
 float cTime=0;
 float pTime=0;
@@ -135,6 +137,8 @@ int blue=0;
 int yellow=0;
 int flag=0;
 int BLDC = 0;
+int color_flag=0;
+int color_value=0;
 
 uint8_t HC_PS2_RX[9];
 uint8_t HC_PS2_TX[9]={0x01, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,};
@@ -189,6 +193,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan);
 void can_transmit(CAN_HandleTypeDef* hcan1, uint16_t id, int16_t msg1, int16_t msg2, int16_t msg3, int16_t msg4);
 void calculatePID(void);
 void motorspeed(void);
+int Color_Sensor();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -869,36 +874,37 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-//void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
-//{
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+{
 //	if(htim->Instance==TIM5){
 //		Motor.my_pos = ((int32_t)__HAL_TIM_GET_COUNTER(htim)) / 100;
 //	}
-//	if(htim-> Instance == TIM3){
-//		  if(is_first == 0){
-//			  ic1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-//			  is_first = 1;
-//		  }else
-//		  {
-//			  ic2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-//			  if(ic2>ic1)
-//			  {
-//				  dif = ic2 - ic1;
-//			  }
-//			  else if(ic1>ic2){
-//				  dif = (0xffffffff-ic1) + ic2;
-//			  }
-//			  freq = 1000/dif;
+	if(htim-> Instance == TIM3){
+		  if(is_first == 0){
+			  ic1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+			  is_first = 1;
+		  }
+		  else{
+			  ic2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+			  if(ic2>ic1)
+			  {
+				  dif = ic2 - ic1;
+			  }
+			  else if(ic1>ic2){
+				  dif = (0xffffffff-ic1) + ic2;
+			  }
+			  freq = 1000/dif;
 //			  if(freq>50 && freq<95){
 //				  blue = 1;
 //			  }else
 //				  blue =0;
 ////			  HAL_Delay(500);
 //			  __HAL_TIM_SET_COUNTER(htim, 0);
-//			  is_first = 0;
-//		  }
-//	  }
-//}
+			  is_first = 0;
+		  }
+
+	}
+}
 
 void MotorUp(void)
 {
@@ -908,7 +914,6 @@ void MotorUp(void)
 
 void MotorDown(void)
 {
-
 	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_SET);
 }
@@ -942,10 +947,10 @@ void motorspeed(){
 	else
 		motor_dir = 0;
 	Motor.PWM = (int)fabs(Motor.ControlSignal);
-	if(Motor.PWM > 300)
+	if(Motor.PWM > 120)
 		TIM8 -> CCR1 = 1;
 //	TIM8 -> CCR2 = 50;
-	if(Motor.PWM < 300 && DC_pid.error != 0){
+	if(Motor.PWM < 120 && DC_pid.error != 0){
 		TIM8 -> CCR1 = 60;
 	}
 	if(motor_dir == 1){
@@ -955,6 +960,35 @@ void motorspeed(){
 	}else{
 		MotorStop();
 	}
+}
+int Color_Sensor(){
+	HAL_GPIO_WritePin(S3_GPIO_Port, S3_Pin, SET);
+	HAL_GPIO_WritePin(S2_GPIO_Port, S2_Pin, RESET);
+	// blue check
+	color_flag=1;
+	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
+	HAL_Delay(10);
+	blue_freq=freq;
+	color_flag=0;
+	HAL_GPIO_WritePin(S3_GPIO_Port, S3_Pin, RESET);
+	HAL_GPIO_WritePin(S2_GPIO_Port, S2_Pin, RESET);
+	HAL_Delay(10);
+	red_freq=freq;
+	HAL_TIM_IC_Stop_IT(&htim3, TIM_CHANNEL_1);
+	if(blue_freq>=0.3 && red_freq<=0.2){
+		//blue ball
+		color_flag=1;
+	}
+	if(red_freq>=0.3 && blue_freq<=0.2){
+		//red ball
+		color_flag=1;
+	}
+	if((red_freq>=0.2 && red_freq<=0.35) && (blue_freq>=0.2 && blue_freq<=0.35)){
+		// purple ball
+		color_flag=0;
+	}
+	return color_flag;
+
 }
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 //	uint8_t rxData[8];
@@ -1066,7 +1100,7 @@ void Wheel_task(void const * argument)
 		  can_transmit(&hcan1, FIRST_GROUP_ID, M1.Out, M2.Out, M3.Out, M4.Out);
  }
 
-    osDelay(5);
+    osDelay(1);
   }
   /* USER CODE END 5 */
 }
@@ -1104,7 +1138,7 @@ void task2_joystick(void const * argument)
 		  BLDC = 2;
 	  }else if(HC_PS2_RX[4]==247){
 		  yellow=1;
-		  Motor.target_pos = 1800;
+		  Motor.target_pos = 1820;
 	  }else if(HC_PS2_RX[4]==253){
 		  yellow=2;
 		  Motor.target_pos = 0;
@@ -1267,15 +1301,45 @@ void DC_motor(void const * argument)
 			TIM4->CCR2 = 909;
 			flag = 1;
 			//HAL_Delay(500);
-			while((HAL_GPIO_ReadPin(BALL1_GPIO_Port, BALL1_Pin)==0) || (HAL_GPIO_ReadPin(BALL2_GPIO_Port, BALL2_Pin)==0)){
+			if((HAL_GPIO_ReadPin(BALL1_GPIO_Port, BALL1_Pin)==0) || (HAL_GPIO_ReadPin(BALL2_GPIO_Port, BALL2_Pin)==0)){
 				TIM4->CCR1 = 920;
 				TIM4->CCR2 = 920;
 //				HAL_Delay(2000);
+//				Motor.target_pos = 890;
+//				HAL_GPIO_WritePin(S3_GPIO_Port, S3_Pin, SET);
+//				HAL_GPIO_WritePin(S2_GPIO_Port, S2_Pin, RESET);
+//				// blue check
+//				color_flag=1;
+//				HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
+//				HAL_Delay(10);
+//				blue_freq=freq;
+//				color_flag=0;
+//				HAL_GPIO_WritePin(S3_GPIO_Port, S3_Pin, RESET);
+//				HAL_GPIO_WritePin(S2_GPIO_Port, S2_Pin, RESET);
+//				HAL_Delay(10);
+//				red_freq=freq;
+//				HAL_TIM_IC_Stop_IT(&htim3, TIM_CHANNEL_1);
 				flag = 0;
 				BLDC = 0;
-				blue = 1;
-				Motor.target_pos = 890;
-				break;
+				color_value=0;
+				osDelay(200);
+				color_value=color_value + Color_Sensor();
+				TIM4->CCR1 = 915;
+				TIM4->CCR2 = 915;
+				osDelay(300);
+				color_value=color_value + Color_Sensor();
+				osDelay(300);
+				TIM4->CCR1 = 920;
+				TIM4->CCR2 = 920;
+				color_value=color_value + Color_Sensor();
+				if(color_value >=2){
+					  yellow=1;
+					  Motor.target_pos = 1820;
+				}
+				else{
+							BLDC=2;
+					}
+
 //				if(blue==1 || red==1){
 //					Motor.target_pos = 1800;
 //					break;
@@ -1284,6 +1348,7 @@ void DC_motor(void const * argument)
 //					break;
 //				}
 			}
+
 		}
 		else if(BLDC==2 && flag==0){
 			TIM4->CCR1 = 915;
@@ -1292,14 +1357,14 @@ void DC_motor(void const * argument)
 			while((HAL_GPIO_ReadPin(IR_GPIO_Port, IR_Pin)) == 1){
 				TIM4->CCR1 = 920;
 				TIM4->CCR2 = 920;
-				HAL_Delay(2000);
+				osDelay(2000);
 				BLDC = 0;
 				yellow=2;
 				Motor.target_pos = 0;
 				break;
 			}
 		}
-    osDelay(50);
+    osDelay(5);
   }
   /* USER CODE END DC_motor */
 }
@@ -1322,20 +1387,20 @@ void Colorcheck(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	 if(blue == 1 && Motor.target_pos == 890){//taget pos = 890
-		 calculatePID();
-		 motorspeed();
-		 Motor.target_pos = 890;
-		 while(DC_pid.error < 5 ){
-			 MotorStop();
-			 TIM5->CNT=89000;
-			 Motor.my_pos=890;
-//			 Motor.target_pos = 0;
-//			 yellow=2;
-			 blue = 0;
-			 break;
-		}
-	 }else if(yellow==2 && Motor.target_pos == 0){//target pos = 0
+//	 if( Motor.target_pos == 890){//taget pos = 890
+//		 calculatePID();
+//		 motorspeed();
+//		 Motor.target_pos = 890;
+//		 while(DC_pid.error < 5 ){
+//			 MotorStop();
+//			 TIM5->CNT=89000;
+//			 Motor.my_pos=890;
+////			 Motor.target_pos = 0;
+////			 yellow=2;
+//			 break;
+//		}
+//	 }
+	  if(yellow==2 && Motor.target_pos == 0){//target pos = 0
 		 while(((HAL_GPIO_ReadPin(DOWN1_GPIO_Port, DOWN1_Pin))==0 || (HAL_GPIO_ReadPin(DOWN2_GPIO_Port, DOWN2_Pin))==0) && DC_pid.error < 100){
 			 MotorStop();
 //			 Motor.target_pos=0;
@@ -1347,23 +1412,23 @@ void Colorcheck(void const * argument)
 		 	 Motor.target_pos= 0;
 			 calculatePID();
 			 motorspeed();
-	}else if(yellow==1 && Motor.target_pos == 1800){//target pos = 1800
+	}else if(yellow==1 && Motor.target_pos == 1820){//target pos = 1800
 		 while(((HAL_GPIO_ReadPin(UP1_GPIO_Port, UP1_Pin))==0 || (HAL_GPIO_ReadPin(UP2_GPIO_Port, UP2_Pin))==0) && DC_pid.error < 100){
 			 MotorStop();
-			 Motor.my_pos = 1800;
+			 Motor.my_pos = 1820;
 			 Motor.target_pos = 0;
-			 TIM5->CNT = 180000;
+			 TIM5->CNT = 182000;
 			 yellow=0;
 			 break;
 		 }
-		 	 Motor.target_pos = 1800;
+		 	 Motor.target_pos = 1820;
 			 calculatePID();
 			 motorspeed();
 	}else{
 		 MotorStop();
 		 yellow = 0;
 	 }
-    osDelay(5);
+    osDelay(2);
   }
   /* USER CODE END Colorcheck */
 }
